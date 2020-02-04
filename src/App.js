@@ -1,7 +1,20 @@
 import React, {  Component } from 'react';
 import './App.css';
+// import Radium, {StyleRoot} from 'radium';
 import Person from './Person/Person';
+import styled from 'styled-components';
 
+const StyledButtonWithHovered= styled.button `
+        background-color: ${props=>props.alt?'red':'green'};
+        color:white;
+        font:inherit;
+        border: 1px solid blue;
+        padding:8px;
+        &:hover{
+          background-color:${props=>props.alt?'salmon':'LightGreen'};
+          color:black;
+        }
+`;
 
   // const App=props=>{
   //     const [personState, changePersonState]=useState({
@@ -41,6 +54,8 @@ import Person from './Person/Person';
 
   // }
 
+
+
   class App extends Component{
     constructor(props){
       super(props);
@@ -77,63 +92,103 @@ import Person from './Person/Person';
          persons[personIndex]=person;
           this.setState({
             persons:persons
-
           })
        }
     
-       style={
-         backgroundColor: 'white',
-         font:'inherit',
-         border: '1px solid blue',
-         padding:'8px'
-
-       }
+       
        
       
     deleteThisItem(itemIndex){
+      
       // This below line change the original Array, so we should try to delete the objects without changing the original Array, 
       // there are 2 ways to do RTCDtlsTransportStateChangedEvent.
       // let person=this.state.persons;
       // let person=this.state.persons.slice();
       let person=[...this.state.persons];
-      person.splice(itemIndex,1);
+      const idIndex=this.state.persons.findIndex(
+        (person)=>{
+          return person.id===itemIndex;
+        }
+      )
+      person.splice(idIndex,1);
       this.setState({
         persons:person
       })
 
     }
        
+
    
+
     render(){
+
+      // Below style is used for radium related features and they gets removed once we use styled this styled component.
+      // const style={
+      //   backgroundColor: 'green',
+      //   color:'white',
+      //   font:'inherit',
+      //   border: '1px solid blue',
+      //   padding:'8px',
+      //   ':hover':{
+      //     backgroundColor:'LightGreen',
+      //     color:'black'
+      //   }
+
+      // }
       let persons=null;
 
-     
-        if(this.state.showPersons){
-                persons=(
-                  <div>
-                    {
-                      this.state.persons.map((person, index)=>{
-                        return <Person name={person.name} age={person.age}  key={person.id} changeName={(event)=>this.changeNameHandler(event, person.id)}></Person>
-                      })
-                    }
-                  </div>
-                )
-              }
+      const classes=[];
+      if (this.state.persons.length<=2)
+          classes.push('red');
+      if (this.state.persons.length<=1)
+          classes.push('bold');
+      if(this.state.showPersons){
+              persons=(
+                <div>
+                  {
+                    this.state.persons.map((person, index)=>{
+                      return <Person name={person.name} age={person.age}  key={person.id} changeName={(event)=>this.changeNameHandler(event, person.id)} clickedItem={()=>this.deleteThisItem(person.id)}></Person>
+                    })
+                  }
+                </div>
+              )
+             
+              // style.backgroundColor="red";
+              // style[':hover']={
+              //   backgroundColor:'salmon',
+              //   color:'black'
+              // }
+            }
+          
+
               // clickedItem={this.deleteThisItem.bind(this,index)}
           {/* // persons=<div>
           //           <Person name={this.state.persons[0].name} age={this.state.persons[0].age}></Person>
           //           <Person name={this.state.persons[1].name} age={this.state.persons[1].age} clickedItem={this.changeNameHandler}>My Hobbies Racing</Person>
           //           <Person name={this.state.persons[2].name} age={this.state.persons[2].age} changeName={this.changeNameHandler}></Person>
           //         </div> */}
+
+
      
       return (
-        <div className="App">
-            I am in header noe
-           <br></br>
-           {/* This below method of passing an argument to the switchNameHandler is not recommended due to inefficiency and performance issues. */}
-           {/* <button onClick={()=>this.switchNameHandler("Asit")} style={this.style}>Switch Names</button> */}
-          
-           <button onClick={this.switchNameHandler} style={this.style}>Conditional Show</button>
+
+
+        // Here below the styleroot has been implemented because of media query used in person.js. The stylerot has been imported 
+        // from radium
+
+
+        // <StyleRoot>
+          <div className="App">
+              <span className={classes.join(" ")}>I am in header noe</span>
+            <br></br>
+
+
+            {/* This below method of passing an argument to the switchNameHandler is not recommended due to inefficiency and performance issues. */}
+            {/* <button onClick={()=>this.switchNameHandler("Asit")} style={this.style}>Switch Names</button> */}
+            
+            <StyledButtonWithHovered alt={this.state.showPersons} onClick={()=>this.switchNameHandler()}>Conditional Show</StyledButtonWithHovered>
+            {/* <button onClick={this.switchNameHandler} style={style}>Conditional Show</button> */}
+
 
     {/* { this.state.showPersons===true?
     <div>
@@ -141,19 +196,21 @@ import Person from './Person/Person';
            <Person name={this.state.persons[1].name} age={this.state.persons[1].age} clickedItem={this.switchNameHandler.bind(this,"Asit")}>My Hobbies Racing</Person>
            <Person name={this.state.persons[2].name} age={this.state.persons[2].age} changeName={this.changeNameHandler}></Person>
            </div>:null
-
-         
-      }   */}
+    }   */}
       
-           {persons}
 
-         
-      </div>
+      
+            {persons}
+
+          
+        </div>
+      // </StyleRoot>
       );
     }
   }
 
 
+// export default Radium(App);
 export default App;
 
 
