@@ -1,8 +1,10 @@
 import React, {  Component } from 'react';
-import './App.css';
+import classes from './App.module.css';
 // import Radium, {StyleRoot} from 'radium';
-import Person from './Person/Person';
+import Person from '../components/Persons/Person/Person';
 import styled from 'styled-components';
+import Persons from '../components/Persons/Persons';
+import Cockpit from '../components/cockpit/Cockpit';
 
 const StyledButtonWithHovered= styled.button `
         background-color: ${props=>props.alt?'red':'green'};
@@ -59,13 +61,15 @@ const StyledButtonWithHovered= styled.button `
   class App extends Component{
     constructor(props){
       super(props);
+      console.log('[App.js] Constructor', props);
       this.state={
         persons:[
           {id: 1, name:"abhisek", age: 29},
           {id: 2, name:"abhinav", age: 27},
           {id: 3, name:"Ravi", age: 26}
         ],
-        showPersons:true
+        showPersons:true,
+        showCockpit:true
       }
     }
 
@@ -77,7 +81,6 @@ const StyledButtonWithHovered= styled.button `
        
        }
        changeNameHandler=(event, id)=>{
-         
          const personIndex=this.state.persons.findIndex(
            (p)=>{
               return id===p.id;
@@ -97,13 +100,17 @@ const StyledButtonWithHovered= styled.button `
     
        
        
+    static getDerivedStateFromProps(props, state){
+      console.log('[App.js] getDerivedStateFromProps', props);
+    }   
       
     deleteThisItem(itemIndex){
-      
       // This below line change the original Array, so we should try to delete the objects without changing the original Array, 
       // there are 2 ways to do RTCDtlsTransportStateChangedEvent.
       // let person=this.state.persons;
       // let person=this.state.persons.slice();
+
+
       let person=[...this.state.persons];
       const idIndex=this.state.persons.findIndex(
         (person)=>{
@@ -114,13 +121,11 @@ const StyledButtonWithHovered= styled.button `
       this.setState({
         persons:person
       })
-
     }
        
 
-   
+     render(){
 
-    render(){
 
       // Below style is used for radium related features and they gets removed once we use styled this styled component.
       // const style={
@@ -136,22 +141,25 @@ const StyledButtonWithHovered= styled.button `
 
       // }
       let persons=null;
-
-      const classes=[];
-      if (this.state.persons.length<=2)
-          classes.push('red');
-      if (this.state.persons.length<=1)
-          classes.push('bold');
+      console.log('[App.js] render');
+     
       if(this.state.showPersons){
               persons=(
                 <div>
-                  {
-                    this.state.persons.map((person, index)=>{
-                      return <Person name={person.name} age={person.age}  key={person.id} changeName={(event)=>this.changeNameHandler(event, person.id)} clickedItem={()=>this.deleteThisItem(person.id)}></Person>
-                    })
-                  }
+                <Persons 
+                  persons={this.state.persons} 
+                  changeName={this.changeNameHandler} 
+                  clickedItem={this.deleteThisItem.bind(this)}/>
                 </div>
-              )
+                // <div>
+                //   {
+                //     this.state.persons.map((person, index)=>{
+                //       return <Person name={person.name} age={person.age}  key={person.id} changeName={(event)=>this.changeNameHandler(event, person.id)} clickedItem={()=>this.deleteThisItem(person.id)}></Person>
+                //     })
+                //   }
+                // </div>
+              );
+
              
               // style.backgroundColor="red";
               // style[':hover']={
@@ -176,18 +184,25 @@ const StyledButtonWithHovered= styled.button `
         // Here below the styleroot has been implemented because of media query used in person.js. The stylerot has been imported 
         // from radium
 
-
-        // <StyleRoot>
-          <div className="App">
-              <span className={classes.join(" ")}>I am in header noe</span>
-            <br></br>
+        <div className={classes.App}>
+        {/* // <StyleRoot> */}
+        <button onClick={()=>{
+          this.setState({
+            showCockpit:false
+          })
+        }}>Remove Cockpit</button>
+        {this.state.showCockpit===true? <Cockpit  
+              stateForCockpit={this.state}  
+              switchNames={this.switchNameHandler}
+              titleCockpit={this.props.appTitle}/>:null}
+            
+          
 
 
             {/* This below method of passing an argument to the switchNameHandler is not recommended due to inefficiency and performance issues. */}
             {/* <button onClick={()=>this.switchNameHandler("Asit")} style={this.style}>Switch Names</button> */}
             
-            <StyledButtonWithHovered alt={this.state.showPersons} onClick={()=>this.switchNameHandler()}>Conditional Show</StyledButtonWithHovered>
-            {/* <button onClick={this.switchNameHandler} style={style}>Conditional Show</button> */}
+            {/* <StyledButtonWithHovered alt={this.state.showPersons} onClick={()=>this.switchNameHandler()}>Conditional Show</StyledButtonWithHovered> */}
 
 
     {/* { this.state.showPersons===true?
@@ -206,6 +221,10 @@ const StyledButtonWithHovered= styled.button `
         </div>
       // </StyleRoot>
       );
+    }
+
+    componentDidMount(){
+      console.log('[App.js] componentDidMount');
     }
   }
 
