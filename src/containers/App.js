@@ -2,21 +2,24 @@ import React, {  Component } from 'react';
 import classes from './App.module.css';
 // import Radium, {StyleRoot} from 'radium';
 import Person from '../components/Persons/Person/Person';
-import styled from 'styled-components';
+// import styled from 'styled-components';
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/cockpit/Cockpit';
+import Aux from '../hoc/Auxiliary';
+import withClasses from '../hoc/withClasses';
+import AuthContext from '../context/auth-context';
 
-const StyledButtonWithHovered= styled.button `
-        background-color: ${props=>props.alt?'red':'green'};
-        color:white;
-        font:inherit;
-        border: 1px solid blue;
-        padding:8px;
-        &:hover{
-          background-color:${props=>props.alt?'salmon':'LightGreen'};
-          color:black;
-        }
-`;
+// const StyledButtonWithHovered= styled.button `
+//         background-color: ${props=>props.alt?'red':'green'};
+//         color:white;
+//         font:inherit;
+//         border: 1px solid blue;
+//         padding:8px;
+//         &:hover{
+//           background-color:${props=>props.alt?'salmon':'LightGreen'};
+//           color:black;
+//         }
+// `;
 
   // const App=props=>{
   //     const [personState, changePersonState]=useState({
@@ -69,7 +72,9 @@ const StyledButtonWithHovered= styled.button `
           {id: 3, name:"Ravi", age: 26}
         ],
         showPersons:true,
-        showCockpit:true
+        showCockpit:true,
+        personCounter:0,
+        isAuthenticated:false
       }
     }
 
@@ -79,6 +84,13 @@ const StyledButtonWithHovered= styled.button `
               showPersons:!showPerson
             })
        
+       }
+
+       authenticateHandler=()=>{
+        //  debugger;
+         this.setState({
+           isAuthenticated:true
+         });
        }
        changeNameHandler=(event, id)=>{
          const personIndex=this.state.persons.findIndex(
@@ -93,15 +105,20 @@ const StyledButtonWithHovered= styled.button `
          const persons=[...this.state.persons];
          
          persons[personIndex]=person;
-          this.setState({
-            persons:persons
-          })
+          this.setState(
+            (prevState, props)=>{
+              return {
+                persons:persons,
+                personCounter: prevState.personCounter+1
+              }
+            })
        }
     
        
        
     static getDerivedStateFromProps(props, state){
       console.log('[App.js] getDerivedStateFromProps', props);
+      return null;
     }   
       
     deleteThisItem(itemIndex){
@@ -149,7 +166,8 @@ const StyledButtonWithHovered= styled.button `
                 <Persons 
                   persons={this.state.persons} 
                   changeName={this.changeNameHandler} 
-                  clickedItem={this.deleteThisItem.bind(this)}/>
+                  clickedItem={this.deleteThisItem.bind(this)}
+                  isPersonAuthenticated={this.state.isAuthenticated}/>
                 </div>
                 // <div>
                 //   {
@@ -184,18 +202,28 @@ const StyledButtonWithHovered= styled.button `
         // Here below the styleroot has been implemented because of media query used in person.js. The stylerot has been imported 
         // from radium
 
-        <div className={classes.App}>
+        // <div className={classes.App}>
+
+
+        <Aux>
         {/* // <StyleRoot> */}
         <button onClick={()=>{
           this.setState({
             showCockpit:false
           })
         }}>Remove Cockpit</button>
-        {this.state.showCockpit===true? <Cockpit  
-              stateForCockpit={this.state}  
+        <AuthContext.Provider value={{authenticate:this.state.isAuthenticated,
+              login:this.authenticateHandler}}>
+        {this.state.showCockpit===true? 
+        
+        <Cockpit  
+              personLength={this.state.persons.length}  
               switchNames={this.switchNameHandler}
-              titleCockpit={this.props.appTitle}/>:null}
-            
+              titleCockpit={this.props.appTitle}
+              showPerson={this.state.showPersons}
+              // authenticate={this.authenticateHandler}
+              />:null}
+
           
 
 
@@ -212,14 +240,12 @@ const StyledButtonWithHovered= styled.button `
            <Person name={this.state.persons[2].name} age={this.state.persons[2].age} changeName={this.changeNameHandler}></Person>
            </div>:null
     }   */}
-      
+          {persons}
+          </AuthContext.Provider>
+        </Aux>
 
-      
-            {persons}
-
-          
-        </div>
-      // </StyleRoot>
+        
+         // </StyleRoot>
       );
     }
 
@@ -230,7 +256,7 @@ const StyledButtonWithHovered= styled.button `
 
 
 // export default Radium(App);
-export default App;
+export default withClasses(App, classes.App);
 
 
 
