@@ -78,44 +78,42 @@ import AuthContext from '../context/auth-context';
       }
     }
 
-       switchNameHandler=()=>{
-            const showPerson=this.state.showPersons;
-            this.setState({
-              showPersons:!showPerson
-            })
-       
-       }
-
-       authenticateHandler=()=>{
-        //  debugger;
-         this.setState({
-           isAuthenticated:true
-         });
-       }
-       changeNameHandler=(event, id)=>{
-         const personIndex=this.state.persons.findIndex(
-           (p)=>{
-              return id===p.id;
-           }
-         )
-         const person={...this.state.persons[personIndex]};
-
-         person.name=event.target.value;
-
-         const persons=[...this.state.persons];
-         
-         persons[personIndex]=person;
-          this.setState(
-            (prevState, props)=>{
-              return {
-                persons:persons,
-                personCounter: prevState.personCounter+1
-              }
-            })
-       }
+    switchNameHandler=()=>{
+        const showPerson=this.state.showPersons;
+        this.setState({
+          showPersons:!showPerson
+        })
     
-       
-       
+    }
+
+    authenticateHandler=()=>{
+    //  debugger;
+      this.setState({
+        isAuthenticated:true
+      });
+    }
+    changeNameHandler=(event, id)=>{
+      const personIndex=this.state.persons.findIndex(
+        (p)=>{
+          return id===p.id;
+        }
+      )
+      const person={...this.state.persons[personIndex]};
+
+      person.name=event.target.value;
+
+      const persons=[...this.state.persons];
+      
+      persons[personIndex]=person;
+      this.setState(
+        (prevState, props)=>{
+          return {
+            persons:persons,
+            personCounter: prevState.personCounter+1
+          }
+        })
+    }
+    
     static getDerivedStateFromProps(props, state){
       console.log('[App.js] getDerivedStateFromProps', props);
       return null;
